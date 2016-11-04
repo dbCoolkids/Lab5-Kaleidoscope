@@ -25,6 +25,12 @@ class Welcome extends Application
 		$result .= $this->parser->parse('category-home', $category, true);
         $oddrow = ! $oddrow;
     }
+
+    // get the user role
+	$this->data['userrole'] = $this->session->userdata('userrole');
+	if ($this->data['userrole'] == NULL) $this->data['userrole'] = '?';
+
+
     $this->data['content'] = $result;
     $this->render();
 }
