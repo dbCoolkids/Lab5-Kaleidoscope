@@ -2,7 +2,7 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Hiring extends Application
+class Maintenance extends Application
 {
 
 	function __construct() {
@@ -11,13 +11,18 @@ class Hiring extends Application
 
 
 public function index() {
-    $stuff = file_get_contents('../data/jobs.md');
+    $role = $this->session->userdata('userrole');
+    if ($role == 'admin') 
+    	$stuff = "Welcome admin! :D";
+    else 
+    	$stuff = "You are not authorized to access this page. Go away";
     $this->data['content'] = $this->parsedown->parse($stuff);
-    
-    // get the user role
+
+        // get the user role
 	$this->data['userrole'] = $this->session->userdata('userrole');
 	if ($this->data['userrole'] == NULL) $this->data['userrole'] = '?';
-    $this->render('template_secondary'); 
+
+    $this->render('template.php'); 
 }
 
 }
