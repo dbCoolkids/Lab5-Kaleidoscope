@@ -24,6 +24,10 @@ class Shopping extends Application {
     		}
     		$count++;
 		}
+            // get the user role
+    $this->data['userrole'] = $this->session->userdata('userrole');
+    if ($this->data['userrole'] == NULL) $this->data['userrole'] = '?';
+    
     	$this->render('template_shopping'); 
     }
 
