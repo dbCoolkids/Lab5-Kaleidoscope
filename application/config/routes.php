@@ -52,6 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
 $route['crud/edit/(:num)'] = 'maintenance/edit/$1';
+$route['crud/cancel'] = 'maintenance/cancel';
 
 
 $route['default_controller'] = 'welcome';
