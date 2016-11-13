@@ -1,5 +1,4 @@
 <h2>Menu Maintenance - Editing</h2>
-{error_messages}
 
 <form action="/crud/save" method="post">
 	{fid}
