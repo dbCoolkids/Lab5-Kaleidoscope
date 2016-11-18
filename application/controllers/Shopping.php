@@ -6,8 +6,6 @@ class Shopping extends Application {
 
     function __construct() {
         parent::__construct();
-        $this->session->unset_userdata('order');
-
     }
 
     public function index() {
@@ -22,11 +20,8 @@ class Shopping extends Application {
         $this->render('template');  // use the default template
     }
 
-    public function keep_shopping() {
-        $stuff = file_get_contents('../data/receipt.md');
-        $this->data['receipt'] = $this->parsedown->parse($stuff);
-        $this->data['content'] = '';
-
+    public function keep_shopping() 
+    {
         //pictorial menu
         $count = 1;
         foreach ($this->Categories->all() as $category) {
@@ -40,6 +35,11 @@ class Shopping extends Application {
             $count++;
         }
 
+        $order = new Order($this->session->userdata('order'));
+        $stuff = $order->receipt();
+
+        $this->data['receipt'] = $this->parsedown->parse($stuff);
+        $this->data['content'] = '';
         $this->render('template_shopping');
     }
 
@@ -48,10 +48,30 @@ class Shopping extends Application {
         // create a new order if needed
         if (! $this->session->has_userdata('order')) {
             $order = new Order();
-            $this->session->set_userdata('order',$order);
+            $this->session->set_userdata('order', (array) $order);
         }
 
         $this->keep_shopping();
+    }
+
+    public function cancel() 
+    {
+        // Drop any order in progress
+        if ($this->session->has_userdata('order')) 
+        {
+            $this->session->unset_userdata('order');
+        }
+
+        $this->index();
+    }
+
+    public function add($what) 
+    {
+        $order = new Order($this->session->userdata('order'));
+        $order->addItem($what);
+        $this->session->set_userdata('order',(array) $order);
+
+        redirect('/shopping');
     }
 
 }
