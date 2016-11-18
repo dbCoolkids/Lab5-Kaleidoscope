@@ -45,7 +45,7 @@ class Order extends CI_Model {
     	$result = $this->data['pagetitle'] . '  ' . PHP_EOL;
     	$result .= date(DATE_ATOM) . PHP_EOL;
     	$result .= PHP_EOL . 'Your Order #:'. PHP_EOL . PHP_EOL;
-    	$result .= '<font size="8"><b>' . $which . '</b></font>' . PHP_EOL; 
+    	$result .= '<font size="18"><b>' . $which . '</b></font>' . PHP_EOL; 
 
     	foreach($this->items as $key => $value) 
     	{
