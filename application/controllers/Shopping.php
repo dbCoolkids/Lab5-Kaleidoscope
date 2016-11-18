@@ -4,18 +4,38 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Shopping extends Application {
 
-    function __construct() {
+    function __construct() 
+    {
         parent::__construct();
     }
 
-    public function index() {
+    public function index() 
+    {
         // What is the user up to?
         if ($this->session->has_userdata('order'))
             $this->keep_shopping();
         else $this->summarize();
     }
 
-    public function summarize() {
+    public function summarize() 
+    {
+        // identify all of the order files
+        $this->load->helper('directory');
+        $candidates = directory_map('../data/');
+        $parms = array();
+        foreach ($candidates as $filename) {
+           if (substr($filename,0,5) == 'order') {
+               // restore that order object
+               $order = new Order ('../data/' . $filename);
+            // setup view parameters
+               $parms[] = array(
+                   'number' => $order->number,
+                   'datetime' => $order->datetime,
+                   'total' => $order->total()
+                       );
+            }
+        }
+        $this->data['orders'] = $parms;
         $this->data['pagebody'] = 'summary';
         $this->render('template');  // use the default template
     }
@@ -43,7 +63,8 @@ class Shopping extends Application {
         $this->render('template_shopping');
     }
 
-    public function neworder() {
+    public function neworder() 
+    {
 
         // create a new order if needed
         if (! $this->session->has_userdata('order')) {
@@ -72,6 +93,26 @@ class Shopping extends Application {
         $this->session->set_userdata('order',(array) $order);
 
         redirect('/shopping');
+    }
+
+    public function checkout() 
+    {
+        $order = new Order($this->session->userdata('order'));
+        // ignore invalid requests
+        if (! $order->validate())
+            redirect('/shopping');
+
+        $order->save();
+        $this->session->unset_userdata('order');
+        redirect('/shopping');
+    }
+
+    public function examine($which) 
+    {
+        $order = new Order ('../data/order' . $which . '.xml');
+        $stuff = $order->receipt($which);
+        $this->data['content'] = $this->parsedown->parse($stuff);
+        $this->render();
     }
 
 }
