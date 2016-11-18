@@ -55,6 +55,9 @@ $route['crud/edit/(:num)'] = 'maintenance/edit/$1';
 $route['crud/cancel'] = 'maintenance/cancel';
 $route['crud/save'] = 'maintenance/save';
 
+//$route['shopping/neworder'] = 'shopping/neworder';
+//$route['shopping/cancel'] = 'shopping/cancel';
+
 
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
