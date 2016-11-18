@@ -45,6 +45,7 @@ class Maintenance extends Application
             $this->session->set_userdata('key',$id);
             $this->session->set_userdata('record',$record);
         }
+        $this->data['action'] = (empty($key)) ? 'Adding' : 'Editing';
 
         // build the form fields
         $this->data['fid'] = makeTextField('Menu code', 'id', $record->id);
@@ -147,6 +148,73 @@ class Maintenance extends Application
 
         // and wrap these per our view fragment
         $this->data['error_messages'] = $this->parser->parse('mtce-errors',['error_messages' => $result], true);
+    }
+
+    function replace_picture() 
+    {
+        $config = [
+        'upload_path' => './images', // relative to front controller
+        'allowed_types' => 'gif|jpg|jpeg|png',
+        'max_size' => 100, // 100KB should be enough for our graphical menu
+        'max_width' => 256,
+        'max_height' => 256, // actually, we want exactly 256x256
+        'min_width' => 256,
+        'min_height' => 256, // fixed it
+        'remove_spaces' => TRUE, // eliminate any spaces in the name
+        'overwrite' => TRUE, // overwrite existing image
+        ];
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload('replacement')) 
+        {
+            $this->error_messages[] = $this->upload->display_errors();
+            return NULL;
+        } else
+            return $this->upload->data('file_name');
+
+        // update our data transfer object
+        $incoming = $this->input->post();
+
+        foreach(get_object_vars($record) as $index => $value)
+        {
+            if (isset($incoming[$index]))
+            {
+                $record->$index = $incoming[$index];
+            }
+        }
+         
+        $newguy = $_FILES['replacement'];
+        if (!empty($newguy['name'])) 
+        {
+         $record->picture = $this->replace_picture ();
+            if ($record->picture != null)
+            {
+                $_POST['picture'] = $record->picture; // override picture name
+            }
+        }
+        $this->session->set_userdata('record',$record);
+    }
+
+    function delete()
+    {
+        $key = $this->session->userdata('key');
+        $record = $this->session->userdata('record');
+
+        //only delete if editing an existing record
+        if(! empty($record))
+        {
+            $this->menu->delete($key);
+        }
+        $this->index();
+    }
+
+    function add() {
+        $key = NULL;
+        $record = $this->menu->create();
+        $this->session->set_userdata('key', $key);
+        $this->session->set_userdata('record', $record);
+        $this->edit();
     }
 
 }
